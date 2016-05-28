@@ -78,20 +78,6 @@ public class WoodenBucket
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-        for (ItemWoodenBucket.BucketTypes bucket : ItemWoodenBucket.BucketTypes.values())
-        {
-            for (Fluid fluid : FluidRegistry.getRegisteredFluids().values())
-            {
-                FluidStack stack = new FluidStack(fluid, FluidContainerRegistry.BUCKET_VOLUME);
-                ItemStack item = new ItemStack(itemBucket, 1, bucket.ordinal());
-                int f = itemBucket.fill(item, stack, true);
-                if (f >= FluidContainerRegistry.BUCKET_VOLUME)
-                {
-                    FluidContainerRegistry.registerFluidContainer(fluid, item, new ItemStack(itemBucket, 1, bucket.ordinal()));
-                }
-            }
-        }
-
         if (GENERATE_MILK_FLUID && FluidRegistry.getFluid("milk") == null)
         {
             fluid_milk = new Fluid("milk");
