@@ -3,6 +3,9 @@ package com.builtbroken.woodenbucket;
 import com.builtbroken.woodenbucket.bucket.ItemWoodenBucket;
 import com.builtbroken.woodenbucket.bucket.PamBucketRecipe;
 import com.builtbroken.woodenbucket.fluid.BlockMilk;
+import com.builtbroken.woodenbucket.mods.agricraft.AgricraftWaterPad;
+import com.builtbroken.woodenbucket.mods.BucketHandler;
+import com.builtbroken.woodenbucket.mods.agricraft.AgricraftWaterPadFilled;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -72,7 +75,11 @@ public class WoodenBucket
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
-
+        if(Loader.isModLoaded("AgriCraft"))
+        {
+            BucketHandler.addBucketHandler(com.InfinityRaider.AgriCraft.init.Blocks.blockWaterPad, new AgricraftWaterPad());
+            BucketHandler.addBucketHandler(com.InfinityRaider.AgriCraft.init.Blocks.blockWaterPadFull, new AgricraftWaterPadFilled());
+        }
     }
 
     @Mod.EventHandler

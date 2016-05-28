@@ -197,9 +197,21 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
                     Block block = world.getBlock(i, j, k);
                     Material material = block.getMaterial();
 
-                    if (!material.isSolid() && block.isReplaceable(world, i, j, k) && player.canPlayerEdit(i, j, k, movingobjectposition.sideHit, itemstack))
+                    if (player.canPlayerEdit(i, j, k, movingobjectposition.sideHit, itemstack))
                     {
-                        return placeFluid(player, itemstack, world, i, j, k);
+                        if (BucketHandler.blockToHandler.containsKey(block))
+                        {
+                            BucketHandler handler = BucketHandler.blockToHandler.get(block);
+                            if (handler != null)
+                            {
+                                return handler.filledBucketClickBlock(player, itemstack, world, i, j, k, world.getBlockMetadata(i, j, k));
+                            }
+                        }
+
+                        if (!material.isSolid() && block.isReplaceable(world, i, j, k))
+                        {
+                            return placeFluid(player, itemstack, world, i, j, k);
+                        }
                     }
 
                     //Offset position based on side hit
@@ -240,7 +252,7 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
                             BucketHandler handler = BucketHandler.blockToHandler.get(block);
                             if (handler != null)
                             {
-                                return handler.filledBucketClickBlock(player, itemstack, world, i, j, k, world.getBlockMetadata(i, j, k));
+                                return handler.placeFluidClickBlock(player, itemstack, world, i, j, k, world.getBlockMetadata(i, j, k));
                             }
                         }
                         return placeFluid(player, itemstack, world, i, j, k);
@@ -693,7 +705,7 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
     public void onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean held)
     {
         FluidStack fluid = getFluid(stack);
-        if(fluid != null && fluid.getFluid() != null)
+        if (fluid != null && fluid.getFluid() != null)
         {
             //Mod support
             if (BucketHandler.fluidToHandler.containsKey(fluid))
@@ -741,9 +753,9 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
             if (BucketHandler.fluidToHandler.containsKey(fluid))
             {
                 BucketHandler handler = BucketHandler.fluidToHandler.get(fluid);
-                if(handler != null)
+                if (handler != null)
                 {
-                    if(handler.onEntityItemUpdate(entityItem))
+                    if (handler.onEntityItemUpdate(entityItem))
                     {
                         return true;
                     }

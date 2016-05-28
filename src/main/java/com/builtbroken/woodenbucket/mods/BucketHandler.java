@@ -80,6 +80,11 @@ public class BucketHandler
         return itemstack;
     }
 
+    public ItemStack placeFluidClickBlock(EntityPlayer player, ItemStack itemstack, World world, int i, int j, int k, int meta)
+    {
+        return itemstack;
+    }
+
     /**
      * Called each tick from an entities inventory
      *
