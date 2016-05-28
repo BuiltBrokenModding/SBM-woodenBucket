@@ -24,7 +24,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fluids.*;
@@ -82,7 +81,6 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
         this.setUnlocalizedName(WoodenBucket.PREFIX + "WoodenBucket");
         this.setCreativeTab(CreativeTabs.tabMisc);
         this.setHasSubtypes(true);
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SideOnly(Side.CLIENT)

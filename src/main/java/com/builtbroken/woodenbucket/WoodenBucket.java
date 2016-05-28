@@ -14,6 +14,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -39,7 +40,7 @@ public class WoodenBucket
 
     public static Logger LOGGER;
 
-    public static Item itemBucket;
+    public static ItemWoodenBucket itemBucket;
 
     public static Fluid fluid_milk;
 
@@ -65,6 +66,7 @@ public class WoodenBucket
 
         itemBucket = new ItemWoodenBucket();
         GameRegistry.registerItem(itemBucket, "wbBucket", DOMAIN);
+        MinecraftForge.EVENT_BUS.register(itemBucket);
     }
 
     @Mod.EventHandler
@@ -76,6 +78,20 @@ public class WoodenBucket
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+        for (ItemWoodenBucket.BucketTypes bucket : ItemWoodenBucket.BucketTypes.values())
+        {
+            for (Fluid fluid : FluidRegistry.getRegisteredFluids().values())
+            {
+                FluidStack stack = new FluidStack(fluid, FluidContainerRegistry.BUCKET_VOLUME);
+                ItemStack item = new ItemStack(itemBucket, 1, bucket.ordinal());
+                int f = itemBucket.fill(item, stack, true);
+                if (f >= FluidContainerRegistry.BUCKET_VOLUME)
+                {
+                    FluidContainerRegistry.registerFluidContainer(fluid, item, new ItemStack(itemBucket, 1, bucket.ordinal()));
+                }
+            }
+        }
+
         if (GENERATE_MILK_FLUID && FluidRegistry.getFluid("milk") == null)
         {
             fluid_milk = new Fluid("milk");
@@ -111,7 +127,9 @@ public class WoodenBucket
                 {
                     Item itemFreshMilk = (Item) Item.itemRegistry.getObject("harvestcraft:freshmilkItem");
                     if (itemFreshMilk == null)
+                    {
                         LOGGER.error("Failed to find item harvestcraft:freshmilkItem");
+                    }
 
                     FluidStack milkFluidStack = new FluidStack(FluidRegistry.getFluid("milk"), FluidContainerRegistry.BUCKET_VOLUME);
                     for (ItemWoodenBucket.BucketTypes type : ItemWoodenBucket.BucketTypes.values())
