@@ -1,6 +1,7 @@
 package com.builtbroken.woodenbucket.bucket;
 
 import com.builtbroken.woodenbucket.WoodenBucket;
+import com.builtbroken.woodenbucket.mods.BucketHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -234,6 +235,14 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
 
                     if (player.canPlayerEdit(i, j, k, movingobjectposition.sideHit, itemstack))
                     {
+                        if (BucketHandler.blockToHandler.containsKey(block))
+                        {
+                            BucketHandler handler = BucketHandler.blockToHandler.get(block);
+                            if (handler != null)
+                            {
+                                return handler.filledBucketClickBlock(player, itemstack, world, i, j, k, world.getBlockMetadata(i, j, k));
+                            }
+                        }
                         return placeFluid(player, itemstack, world, i, j, k);
                     }
                 }
@@ -271,6 +280,15 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
     {
         Block block = world.getBlock(i, j, k);
         int l = world.getBlockMetadata(i, j, k);
+
+        if (BucketHandler.blockToHandler.containsKey(block))
+        {
+            BucketHandler handler = BucketHandler.blockToHandler.get(block);
+            if (handler != null)
+            {
+                return handler.emptyBucketClickBlock(player, itemstack, world, i, j, k, l);
+            }
+        }
 
         if (block == Blocks.water && l == 0)
         {
@@ -665,7 +683,9 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
     public int getColorFromItemStack(ItemStack stack, int pass)
     {
         if (!isEmpty(stack) && pass == 1)
+        {
             return getFluid(stack).getFluid().getColor();
+        }
         return 16777215;
     }
 
@@ -673,24 +693,39 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
     public void onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean held)
     {
         FluidStack fluid = getFluid(stack);
-        if (world.getWorldTime() % 5 == 0)
+        if(fluid != null && fluid.getFluid() != null)
         {
-            if (WoodenBucket.PREVENT_HOT_FLUID_USAGE && fluid != null && fluid.getFluid() != null && fluid.getFluid().getTemperature(fluid) > 400)
+            //Mod support
+            if (BucketHandler.fluidToHandler.containsKey(fluid))
             {
-                //Default 26% chance to be caught on fire
-                if (WoodenBucket.BURN_ENTITY_WITH_HOT_FLUID && entity instanceof EntityLivingBase && world.rand.nextFloat() < ((float) fluid.getFluid().getTemperature(fluid) / 1500f))
+                BucketHandler handler = BucketHandler.fluidToHandler.get(fluid);
+                if (handler != null)
                 {
-                    EntityLivingBase living = (EntityLivingBase) entity;
-                    if (!living.isImmuneToFire())
+                    if (handler.onUpdate(stack, world, entity, slot, held))
                     {
-                        living.setFire(1 + world.rand.nextInt(15));
+                        return;
                     }
-                    //TODO implement direct damage based on armor, or leave that to ItHurtsToDie?
                 }
-                if (WoodenBucket.DAMAGE_BUCKET_WITH_HOT_FLUID && world.rand.nextFloat() < ((float) fluid.getFluid().getTemperature(fluid) / 1500f))
+            }
+            if (world.getWorldTime() % 5 == 0)
+            {
+                if (WoodenBucket.PREVENT_HOT_FLUID_USAGE && fluid.getFluid().getTemperature(fluid) > 400)
                 {
-                    //TODO play sound effect of items burning
-                    stack.setItemDamage(BucketTypes.CHARRED.ordinal());
+                    //Default 26% chance to be caught on fire
+                    if (WoodenBucket.BURN_ENTITY_WITH_HOT_FLUID && entity instanceof EntityLivingBase && world.rand.nextFloat() < ((float) fluid.getFluid().getTemperature(fluid) / 1500f))
+                    {
+                        EntityLivingBase living = (EntityLivingBase) entity;
+                        if (!living.isImmuneToFire())
+                        {
+                            living.setFire(1 + world.rand.nextInt(15));
+                        }
+                        //TODO implement direct damage based on armor, or leave that to ItHurtsToDie?
+                    }
+                    if (WoodenBucket.DAMAGE_BUCKET_WITH_HOT_FLUID && world.rand.nextFloat() < ((float) fluid.getFluid().getTemperature(fluid) / 1500f))
+                    {
+                        //TODO play sound effect of items burning
+                        stack.setItemDamage(BucketTypes.CHARRED.ordinal());
+                    }
                 }
             }
         }
@@ -700,17 +735,34 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
     public boolean onEntityItemUpdate(EntityItem entityItem)
     {
         FluidStack fluid = getFluid(entityItem.getEntityItem());
-        if (entityItem.worldObj.getWorldTime() % 5 == 0)
+        if (fluid != null && fluid.getFluid() != null)
         {
-            if (WoodenBucket.PREVENT_HOT_FLUID_USAGE && fluid != null && fluid.getFluid() != null && fluid.getFluid().getTemperature(fluid) > 400)
+            //Mod support
+            if (BucketHandler.fluidToHandler.containsKey(fluid))
             {
-                if (WoodenBucket.DAMAGE_BUCKET_WITH_HOT_FLUID && entityItem.worldObj.rand.nextFloat() < ((float) fluid.getFluid().getTemperature(fluid) / 1500f))
+                BucketHandler handler = BucketHandler.fluidToHandler.get(fluid);
+                if(handler != null)
                 {
-                    //TODO play sound effect of items burning
-                    //TODO add slightly burnt, crisp, and ash version of the bucket to simulate each time it gets damaged
-                    entityItem.getEntityItem().setItemDamage(BucketTypes.CHARRED.ordinal());
+                    if(handler.onEntityItemUpdate(entityItem))
+                    {
+                        return true;
+                    }
                 }
-                //TODO chance to catch area on fire around it
+            }
+
+            //Base hot fluid support
+            if (entityItem.worldObj.getWorldTime() % 5 == 0)
+            {
+                if (WoodenBucket.PREVENT_HOT_FLUID_USAGE && fluid.getFluid().getTemperature(fluid) > 400)
+                {
+                    if (WoodenBucket.DAMAGE_BUCKET_WITH_HOT_FLUID && entityItem.worldObj.rand.nextFloat() < ((float) fluid.getFluid().getTemperature(fluid) / 1500f))
+                    {
+                        //TODO play sound effect of items burning
+                        //TODO add slightly burnt, crisp, and ash version of the bucket to simulate each time it gets damaged
+                        entityItem.getEntityItem().setItemDamage(BucketTypes.CHARRED.ordinal());
+                    }
+                    //TODO chance to catch area on fire around it
+                }
             }
         }
         return false;
@@ -719,26 +771,37 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
     @Override
     public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer player, EntityLivingBase entity)
     {
-        if (entity instanceof EntityCow && isEmpty(stack))
+        if (entity != null)
         {
-            if (player.worldObj.isRemote)
+            Class<? extends Entity> clazz = entity.getClass();
+            if (BucketHandler.entityToHandler.containsKey(clazz) && BucketHandler.entityToHandler.get(clazz).rightClickEntity(stack, player, entity))
+            {
                 return true;
+            }
 
-            Fluid fluid = FluidRegistry.getFluid("milk");
-            if (fluid != null)
+            if (entity instanceof EntityCow && isEmpty(stack))
             {
-                ItemStack newBucket = new ItemStack(this, 1, stack.getItemDamage());
-                fill(newBucket, new FluidStack(fluid, FluidContainerRegistry.BUCKET_VOLUME), true);
-                stack.stackSize--;
-                player.inventory.addItemStackToInventory(newBucket);
-                player.inventoryContainer.detectAndSendChanges();
+                if (player.worldObj.isRemote)
+                {
+                    return true;
+                }
+
+                Fluid fluid = FluidRegistry.getFluid("milk");
+                if (fluid != null)
+                {
+                    ItemStack newBucket = new ItemStack(this, 1, stack.getItemDamage());
+                    fill(newBucket, new FluidStack(fluid, FluidContainerRegistry.BUCKET_VOLUME), true);
+                    stack.stackSize--;
+                    player.inventory.addItemStackToInventory(newBucket);
+                    player.inventoryContainer.detectAndSendChanges();
+                }
+                else
+                {
+                    ((EntityCow) entity).playLivingSound();
+                    player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal(getUnlocalizedName() + ".error.fluid.milk.notRegistered")));
+                }
+                return true;
             }
-            else
-            {
-                ((EntityCow) entity).playLivingSound();
-                player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal(getUnlocalizedName() + ".error.fluid.milk.notRegistered")));
-            }
-            return true;
         }
         return false;
     }
@@ -765,13 +828,20 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
                 list.add(milkBucket);
             }
         }
+
+        for (BucketHandler handler : BucketHandler.bucketHandlers)
+        {
+            handler.getSubItems(item, list);
+        }
     }
 
     @Override
     public ItemStack getContainerItem(ItemStack itemstack)
     {
         if (isEmpty(itemstack))
+        {
             return null;
+        }
         return new ItemStack(WoodenBucket.itemBucket, 1, itemstack.getItemDamage());
     }
 
