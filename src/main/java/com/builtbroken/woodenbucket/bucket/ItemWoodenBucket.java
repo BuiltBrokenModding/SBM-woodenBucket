@@ -379,7 +379,7 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
                     {
                         if (!world.isRemote)
                         {
-                            world.func_147480_a(x, y, z, true);
+                            //world.func_147480_a(x, y, z, true);
                         }
                         if (stack.getFluid() == FluidRegistry.WATER)
                         {
