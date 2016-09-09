@@ -1,10 +1,11 @@
 package com.builtbroken.woodenbucket;
 
 import com.builtbroken.woodenbucket.bucket.ItemWoodenBucket;
-import com.builtbroken.woodenbucket.bucket.PamBucketRecipe;
+import com.builtbroken.woodenbucket.bucket.PamFreshWaterBucketRecipe;
+import com.builtbroken.woodenbucket.bucket.PamMilkBucketRecipe;
 import com.builtbroken.woodenbucket.fluid.BlockMilk;
-import com.builtbroken.woodenbucket.mods.agricraft.AgricraftWaterPad;
 import com.builtbroken.woodenbucket.mods.BucketHandler;
+import com.builtbroken.woodenbucket.mods.agricraft.AgricraftWaterPad;
 import com.builtbroken.woodenbucket.mods.agricraft.AgricraftWaterPadFilled;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -75,7 +76,7 @@ public class WoodenBucket
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
-        if(Loader.isModLoaded("AgriCraft"))
+        if (Loader.isModLoaded("AgriCraft"))
         {
             BucketHandler.addBucketHandler(com.InfinityRaider.AgriCraft.init.Blocks.blockWaterPad, new AgricraftWaterPad());
             BucketHandler.addBucketHandler(com.InfinityRaider.AgriCraft.init.Blocks.blockWaterPadFull, new AgricraftWaterPadFilled());
@@ -92,7 +93,6 @@ public class WoodenBucket
             Block blockMilk = new BlockMilk(fluid_milk);
             GameRegistry.registerBlock(blockMilk, "wbBlockMilk");
         }
-
 
         //TODO add crafting recipes for milk bucket
         // TODO add proper ore shaped recipes so modded sticks and other items can be used in the recipes
@@ -115,7 +115,7 @@ public class WoodenBucket
         {
             if (config.getBoolean("EnableRegisteringMilkBucket", "PamHarvestCraftSupport", true, "Registers the milk bucket to the ore dictionary to be used in Pam's Harvest Craft recipes"))
             {
-                RecipeSorter.register(PREFIX + "woodenBucketFreshMilk", PamBucketRecipe.class, SHAPED, "after:minecraft:shaped");
+                RecipeSorter.register(PREFIX + "woodenBucketFreshMilk", PamMilkBucketRecipe.class, SHAPED, "after:minecraft:shaped");
                 if (FluidRegistry.getFluid("milk") != null)
                 {
                     Item itemFreshMilk = (Item) Item.itemRegistry.getObject("harvestcraft:freshmilkItem");
@@ -128,27 +128,34 @@ public class WoodenBucket
                     for (ItemWoodenBucket.BucketTypes type : ItemWoodenBucket.BucketTypes.values())
                     {
                         ItemStack milkBucket = new ItemStack(itemBucket, 1, type.ordinal());
-                        ((ItemWoodenBucket) itemBucket).fill(milkBucket, milkFluidStack, true);
-                        /** OreDictionary.registerOre("listAllmilk", milkBucket); */
+                        itemBucket.fill(milkBucket, milkFluidStack, true);
 
-                        GameRegistry.addRecipe(new PamBucketRecipe(milkBucket, new ItemStack(itemFreshMilk, 4, 0)));
+                        GameRegistry.addRecipe(new PamMilkBucketRecipe(milkBucket, new ItemStack(itemFreshMilk, 4, 0)));
+                    }
+                }
+            }
+            if (config.getBoolean("EnableRegisteringFreshWaterBucket", "PamHarvestCraftSupport", true, "Registers the water bucket to the ore dictionary to be used in Pam's Harvest Craft recipes"))
+            {
+                RecipeSorter.register(PREFIX + "woodenBucketFreshMilk", PamFreshWaterBucketRecipe.class, SHAPED, "after:minecraft:shaped");
+                if (FluidRegistry.getFluid("milk") != null)
+                {
+                    Item itemFreshWater = (Item) Item.itemRegistry.getObject("harvestcraft:freshwaterItem");
+                    if (itemFreshWater == null)
+                    {
+                        LOGGER.error("Failed to find item harvestcraft:freshwaterItem");
+                    }
+
+                    FluidStack waterStack = new FluidStack(FluidRegistry.WATER, FluidContainerRegistry.BUCKET_VOLUME);
+                    for (ItemWoodenBucket.BucketTypes type : ItemWoodenBucket.BucketTypes.values())
+                    {
+                        ItemStack milkBucket = new ItemStack(itemBucket, 1, type.ordinal());
+                        itemBucket.fill(milkBucket, waterStack, true);
+
+                        GameRegistry.addRecipe(new PamFreshWaterBucketRecipe(milkBucket, new ItemStack(itemFreshWater, 1, 0)));
                     }
                 }
             }
         }
-
-        /**
-         if(config.getBoolean("listAllWater", "OreDictionary", true, "Lists all water buckets under the ore dictionary name listAllWater"))
-         {
-         FluidStack waterFluidStack = new FluidStack(FluidRegistry.WATER, FluidContainerRegistry.BUCKET_VOLUME);
-         for (ItemWoodenBucket.BucketTypes type : ItemWoodenBucket.BucketTypes.values())
-         {
-         ItemStack waterBucket = new ItemStack(itemBucket, 1, type.ordinal());
-         ((ItemWoodenBucket) itemBucket).fill(waterBucket, waterFluidStack, true);
-         OreDictionary.registerOre("listAllWater", waterBucket);
-         }
-         }
-         */
         config.save();
     }
 }
