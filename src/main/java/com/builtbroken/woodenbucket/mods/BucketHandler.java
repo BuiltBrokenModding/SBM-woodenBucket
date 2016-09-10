@@ -66,6 +66,7 @@ public class BucketHandler
 
     /**
      * Called when the bucket contains fluid and is clicked
+     *
      * @param player
      * @param itemstack
      * @param world
@@ -97,6 +98,23 @@ public class BucketHandler
      */
     public boolean onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean held)
     {
+        return false;
+    }
+
+    /**
+     * Called in the same loop as {@link #onUpdate(ItemStack, World, Entity, int, boolean)} but
+     * only when the bucket has leaked fluid
+     *
+     * @param stack  - bucket
+     * @param world  - world inside
+     * @param entity - entity who has the item
+     * @param slot   - slot the item is inside
+     * @param held   - is the item currently held
+     * @return true to cancel default functionality
+     */
+    public boolean onBucketLeaked(ItemStack stack, World world, Entity entity, int slot, boolean held)
+    {
+        //If you still want the fluid to drain you need to do it yourself if you return true
         return false;
     }
 

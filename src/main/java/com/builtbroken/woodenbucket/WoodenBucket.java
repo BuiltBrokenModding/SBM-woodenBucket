@@ -54,7 +54,13 @@ public class WoodenBucket
     public static boolean DAMAGE_BUCKET_WITH_HOT_FLUID = true;
     public static boolean BURN_ENTITY_WITH_HOT_FLUID = true;
     public static boolean GENERATE_MILK_FLUID = true;
+    public static boolean ENABLE_FLUID_LEAKING = false;
+    public static boolean ALLOW_LEAK_TO_CAUSE_FIRES = true;
 
+    public static int VISCOSITY_TO_IGNORE_LEAKING = 3000;
+    public static int AMOUNT_TO_LEAK = 1;
+    public static float CHANCE_TO_LEAK = 0.03f;
+    public static float LEAK_FIRE_CHANCE = 0.4f;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -66,8 +72,12 @@ public class WoodenBucket
         DAMAGE_BUCKET_WITH_HOT_FLUID = config.getBoolean("DamageBucketWithHotFluid", "WoodenBucketUsage", DAMAGE_BUCKET_WITH_HOT_FLUID, "Will randomly destroy the bucket if it contains hot fluid, lava in other words");
         BURN_ENTITY_WITH_HOT_FLUID = config.getBoolean("BurnPlayerWithHotFluid", "WoodenBucketUsage", BURN_ENTITY_WITH_HOT_FLUID, "Will light the player on fire if the bucket contains a hot fluid, lava in other words");
         GENERATE_MILK_FLUID = config.getBoolean("EnableMilkFluidGeneration", Configuration.CATEGORY_GENERAL, GENERATE_MILK_FLUID, "Will generate a fluid for milk allowing for the bucket to be used for gathering milk from cows");
-
-
+        ENABLE_FLUID_LEAKING = config.getBoolean("Enable", "Leaking", ENABLE_FLUID_LEAKING, "Allows fluid to slowly leak out of the bucket as a nerf. Requested by Darkosto");
+        VISCOSITY_TO_IGNORE_LEAKING = config.getInt("MaxViscosity", "Leaking", VISCOSITY_TO_IGNORE_LEAKING, -1, 10000, "At which point it the flow rate so slow that the leak is plugged, higher values are slower");
+        AMOUNT_TO_LEAK = config.getInt("MaxLeakAmount", "Leaking", AMOUNT_TO_LEAK, 0, 10000, "How much can leak from the bucket each time a leak happens, number is max amount and is randomly ranged between 0 - #");
+        CHANCE_TO_LEAK = config.getFloat("LeakChance", "Leaking", CHANCE_TO_LEAK, 0f, 1f, "What is the chance that a leak will happen, calculated each tick with high numbers being more often");
+        ALLOW_LEAK_TO_CAUSE_FIRES = config.getBoolean("AllowFires", "Leaking", ALLOW_LEAK_TO_CAUSE_FIRES, "If molten fluid leaks, should there be a chance to cause fires?");
+        LEAK_FIRE_CHANCE = config.getFloat("FireChance", "Leaking", LEAK_FIRE_CHANCE, 0f, 1f, "How often to cause fire from molten fluids leaking");
         itemBucket = new ItemWoodenBucket();
         GameRegistry.registerItem(itemBucket, "wbBucket", DOMAIN);
         MinecraftForge.EVENT_BUS.register(itemBucket);

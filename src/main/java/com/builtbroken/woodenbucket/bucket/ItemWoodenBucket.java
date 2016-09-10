@@ -721,7 +721,10 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
             }
             if (world.getWorldTime() % 5 == 0)
             {
-                if (WoodenBucket.PREVENT_HOT_FLUID_USAGE && fluid.getFluid().getTemperature(fluid) > 400)
+                final boolean moltenFluid = fluid.getFluid().getTemperature(fluid) > 400;
+
+                //Handles burning the player
+                if (WoodenBucket.PREVENT_HOT_FLUID_USAGE && moltenFluid)
                 {
                     //Default 26% chance to be caught on fire
                     if (WoodenBucket.BURN_ENTITY_WITH_HOT_FLUID && entity instanceof EntityLivingBase && world.rand.nextFloat() < ((float) fluid.getFluid().getTemperature(fluid) / 1500f))
@@ -737,6 +740,52 @@ public class ItemWoodenBucket extends Item implements IFluidContainerItem
                     {
                         //TODO play sound effect of items burning
                         stack.setItemDamage(BucketTypes.CHARRED.ordinal());
+                    }
+                }
+
+                //Handles leaking of buckets
+                if (WoodenBucket.ENABLE_FLUID_LEAKING && fluid.getFluid().getViscosity(fluid) < WoodenBucket.VISCOSITY_TO_IGNORE_LEAKING)
+                {
+                    if (world.rand.nextFloat() < WoodenBucket.CHANCE_TO_LEAK)
+                    {
+                        //Event handling for bucket leaking
+                        if (BucketHandler.fluidToHandler.containsKey(fluid))
+                        {
+                            BucketHandler handler = BucketHandler.fluidToHandler.get(fluid);
+                            if (handler != null)
+                            {
+                                if (handler.onBucketLeaked(stack, world, entity, slot, held))
+                                {
+                                    return;
+                                }
+                            }
+                        }
+
+                        //Remove fluid from bucket
+                        int drain = WoodenBucket.AMOUNT_TO_LEAK <= 1 ? 1 : world.rand.nextInt(WoodenBucket.AMOUNT_TO_LEAK);
+                        drain(stack, drain, true);
+                        //TODO play dripping sound
+
+                        //Handles setting the world on fire if bucket leaks
+                        if (WoodenBucket.ALLOW_LEAK_TO_CAUSE_FIRES && moltenFluid && world.rand.nextFloat() < WoodenBucket.LEAK_FIRE_CHANCE)
+                        {
+                            for (int i = 0; i < 7; i++)
+                            {
+                                int x = (int) entity.posX;
+                                int y = (int) entity.posY + 2 - i;
+                                int z = (int) entity.posZ;
+
+                                Block block = world.getBlock(x, y, z);
+                                Block block2 = world.getBlock(x, y + 1, z);
+                                if (block.isSideSolid(world, x, y, z, ForgeDirection.UP))
+                                {
+                                    if (block2.isAir(world, x, y + 1, z) || block2.isReplaceable(world, x, y + 1, z))
+                                    {
+                                        world.setBlock(x, y + 1, z, Blocks.air);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
