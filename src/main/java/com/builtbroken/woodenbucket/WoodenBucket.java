@@ -68,15 +68,15 @@ public class WoodenBucket
         {
             type.material = new WoodenBucketMaterial("item." + WoodenBucket.PREFIX + "WoodenBucket." + type.name().toLowerCase(), WoodenBucket.PREFIX + "bucket." + type.name().toLowerCase());
 
-            type.material.PREVENT_HOT_FLUID_USAGE = PREVENT_HOT_FLUID_USAGE;
-            type.material.DAMAGE_BUCKET_WITH_HOT_FLUID = DAMAGE_BUCKET_WITH_HOT_FLUID;
-            type.material.BURN_ENTITY_WITH_HOT_FLUID = BURN_ENTITY_WITH_HOT_FLUID;
-            type.material.ENABLE_FLUID_LEAKING = ENABLE_FLUID_LEAKING;
-            type.material.VISCOSITY_TO_IGNORE_LEAKING = VISCOSITY_TO_IGNORE_LEAKING;
-            type.material.AMOUNT_TO_LEAK = AMOUNT_TO_LEAK;
-            type.material.CHANCE_TO_LEAK = CHANCE_TO_LEAK;
-            type.material.ALLOW_LEAK_TO_CAUSE_FIRES = ALLOW_LEAK_TO_CAUSE_FIRES;
-            type.material.LEAK_FIRE_CHANCE = LEAK_FIRE_CHANCE;
+            type.material.preventHotFluidUsage = PREVENT_HOT_FLUID_USAGE;
+            type.material.damageBucketWithHotFluid = DAMAGE_BUCKET_WITH_HOT_FLUID;
+            type.material.burnEntityWithHotFluid = BURN_ENTITY_WITH_HOT_FLUID;
+            type.material.enableFluidLeaking = ENABLE_FLUID_LEAKING;
+            type.material.viscosityToIgnoreLeaking = VISCOSITY_TO_IGNORE_LEAKING;
+            type.material.amountToLeak = AMOUNT_TO_LEAK;
+            type.material.chanceToLeak = CHANCE_TO_LEAK;
+            type.material.allowLeakToCauseFires = ALLOW_LEAK_TO_CAUSE_FIRES;
+            type.material.leakFireChance = LEAK_FIRE_CHANCE;
 
             BucketMaterialHandler.addMaterial(type.name().toLowerCase(), type.material, type.ordinal());
         }
