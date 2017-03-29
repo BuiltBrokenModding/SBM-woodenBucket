@@ -1,0 +1,8 @@
+item.woodenbucket:WoodenBucket.name=Holzeimer
+item.woodenbucket:WoodenBucket.oak.name=Eichenholzeimer
+item.woodenbucket:WoodenBucket.acacia.name=Akazienholzeimer
+item.woodenbucket:WoodenBucket.birch.name=Birkenholzeimer
+item.woodenbucket:WoodenBucket.jungle.name=Tropenholzeimer
+item.woodenbucket:WoodenBucket.spruce.name=Fichtenholzeimer
+item.woodenbucket:WoodenBucket.big_oak.name=Schwarzeichenholzeimer
+item.woodenbucket:WoodenBucket.charred.name=Verkohlter Eimer
