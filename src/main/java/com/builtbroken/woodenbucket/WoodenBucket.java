@@ -66,7 +66,7 @@ public class WoodenBucket
 
         for (BucketTypes type : BucketTypes.values())
         {
-            type.material = new WoodenBucketMaterial("item." + WoodenBucket.PREFIX + "WoodenBucket." + type.name().toLowerCase(), WoodenBucket.PREFIX + "bucket." + type.name().toLowerCase());
+            type.material = new WoodenBucketMaterial(WoodenBucket.PREFIX + "WoodenBucket." + type.name().toLowerCase(), WoodenBucket.PREFIX + "bucket." + type.name().toLowerCase());
 
             type.material.preventHotFluidUsage = PREVENT_HOT_FLUID_USAGE;
             type.material.damageBucketWithHotFluid = DAMAGE_BUCKET_WITH_HOT_FLUID;
@@ -112,7 +112,7 @@ public class WoodenBucket
     @Mod.EventHandler
     public void missingMappingEvent(FMLMissingMappingsEvent event)
     {
-        for(FMLMissingMappingsEvent.MissingMapping missingMapping : event.get())
+        for (FMLMissingMappingsEvent.MissingMapping missingMapping : event.get())
         {
             if (missingMapping.name.equals(PREFIX + "wbBucket"))
             {
