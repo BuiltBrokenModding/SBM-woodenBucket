@@ -62,11 +62,11 @@ public class WoodenBucket
         ALLOW_LEAK_TO_CAUSE_FIRES = config.getBoolean("AllowFires", "Leaking", ALLOW_LEAK_TO_CAUSE_FIRES, "If molten fluid leaks, should there be a chance to cause fires?");
         LEAK_FIRE_CHANCE = config.getFloat("FireChance", "Leaking", LEAK_FIRE_CHANCE, 0f, 1f, "How often to cause fire from molten fluids leaking");
 
-        FluidModule.doLoadBucket();
+        //FluidModule.doLoadBucket();
 
         for (BucketTypes type : BucketTypes.values())
         {
-            type.material = new WoodenBucketMaterial(WoodenBucket.PREFIX + "WoodenBucket." + type.name().toLowerCase(), WoodenBucket.PREFIX + "bucket." + type.name().toLowerCase());
+            type.material = new WoodenBucketMaterial(type);
 
             type.material.preventHotFluidUsage = PREVENT_HOT_FLUID_USAGE;
             type.material.damageBucketWithHotFluid = DAMAGE_BUCKET_WITH_HOT_FLUID;

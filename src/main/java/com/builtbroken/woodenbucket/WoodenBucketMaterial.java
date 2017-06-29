@@ -2,6 +2,7 @@ package com.builtbroken.woodenbucket;
 
 import com.builtbroken.mc.fluids.bucket.BucketMaterial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -9,9 +10,9 @@ import net.minecraft.item.ItemStack;
  */
 public class WoodenBucketMaterial extends BucketMaterial
 {
-    public WoodenBucketMaterial(String localization, String textureName)
+    public WoodenBucketMaterial(BucketTypes type)
     {
-        super(localization, textureName);
+        super(WoodenBucket.PREFIX + "WoodenBucket." + type.name().toLowerCase(), new ResourceLocation(WoodenBucket.DOMAIN, "items/bucket." + type.name().toLowerCase()));
     }
 
     @Override
