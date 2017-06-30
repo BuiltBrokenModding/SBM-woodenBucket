@@ -1,23 +1,22 @@
 package com.builtbroken.woodenbucket;
 
-import com.builtbroken.mc.fluids.FluidModule;
 import com.builtbroken.mc.fluids.api.reg.BucketMaterialRegistryEvent;
 import com.builtbroken.mc.fluids.bucket.BucketMaterialHandler;
-import com.builtbroken.mc.fluids.fluid.Fluids;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +26,7 @@ import java.io.File;
  * Created by Dark on 7/25/2015.
  */
 @Mod(modid = WoodenBucket.DOMAIN, name = "Wooden Bucket", version = "@MAJOR@.@MINOR@.@REVIS@.@BUILD@", dependencies = "after:vefluids")
+@Mod.EventBusSubscriber(modid = WoodenBucket.DOMAIN)
 public class WoodenBucket
 {
     public static final String DOMAIN = "woodenbucket";
@@ -58,7 +58,41 @@ public class WoodenBucket
         LOGGER = LogManager.getLogger("WoodenBucket");
         config = new Configuration(new File(event.getModConfigurationDirectory(), "bbm/Wooden_Bucket.cfg"));
         config.load();
+    }
 
+    @SubscribeEvent
+    public void registerBucketMaterials(BucketMaterialRegistryEvent.Pre event)
+    {
+        for (BucketTypes type : BucketTypes.values())
+        {
+            type.material = new WoodenBucketMaterial(type);
+            BucketMaterialHandler.addMaterial(type.name().toLowerCase(), type.material, type.ordinal());
+        }
+    }
+
+    @SubscribeEvent
+    public static void registerRecipes(RegistryEvent.Register<IRecipe> event)
+    {
+        //TODO add crafting recipes for milk bucket
+        ResourceLocation location = new ResourceLocation(DOMAIN, "woodenbucket");
+        event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 0), 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood.oak"));
+        event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.SPRUCE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 1), 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood.spruce"));
+        event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.BIRCH.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 2), 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood.birch"));
+        event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.JUNGLE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 3), 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood.jungle"));
+        event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.ACACIA.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 4), 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood.acacia"));
+        event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.BIG_OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 5), 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood.big_oak"));
+        for (ItemStack itemstack : OreDictionary.getOres("planks"))
+        {
+            if (itemstack != null && itemstack.getItem() != Item.getItemFromBlock(Blocks.PLANKS))
+            {
+                event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood.z" + itemstack));
+            }
+        }
+    }
+
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event)
+    {
         PREVENT_HOT_FLUID_USAGE = config.getBoolean("PreventHotFluidUsage", "WoodenBucketUsage", PREVENT_HOT_FLUID_USAGE, "Enables settings that attempt to prevent players from wanting to use the bucket for moving hot fluids");
         DAMAGE_BUCKET_WITH_HOT_FLUID = config.getBoolean("DamageBucketWithHotFluid", "WoodenBucketUsage", DAMAGE_BUCKET_WITH_HOT_FLUID, "Will randomly destroy the bucket if it contains hot fluid, lava in other words");
         BURN_ENTITY_WITH_HOT_FLUID = config.getBoolean("BurnPlayerWithHotFluid", "WoodenBucketUsage", BURN_ENTITY_WITH_HOT_FLUID, "Will light the player on fire if the bucket contains a hot fluid, lava in other words");
@@ -83,68 +117,10 @@ public class WoodenBucket
         }
     }
 
-    @SubscribeEvent
-    public void registerBucketMaterials(BucketMaterialRegistryEvent.Pre event)
-    {
-        for (BucketTypes type : BucketTypes.values())
-        {
-            type.material = new WoodenBucketMaterial(type);
-            BucketMaterialHandler.addMaterial(type.name().toLowerCase(), type.material, type.ordinal());
-        }
-    }
-
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-
-    }
-
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-        //TODO add crafting recipes for milk bucket
-        // TODO add proper ore shaped recipes so modded sticks and other items can be used in the recipes
-        GameRegistry.addShapedRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 0), 's', Items.STICK, 'c', new ItemStack(Items.DYE, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.SPRUCE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 1), 's', Items.STICK, 'c', new ItemStack(Items.DYE, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.BIRCH.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 2), 's', Items.STICK, 'c', new ItemStack(Items.DYE, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.JUNGLE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 3), 's', Items.STICK, 'c', new ItemStack(Items.DYE, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.ACACIA.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 4), 's', Items.STICK, 'c', new ItemStack(Items.DYE, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.BIG_OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.PLANKS, 1, 5), 's', Items.STICK, 'c', new ItemStack(Items.DYE, 1, 2));
-        for (ItemStack itemstack : OreDictionary.getOres("planks"))
-        {
-            if (itemstack != null && itemstack.getItem() != Item.getItemFromBlock(Blocks.PLANKS))
-            {
-                GameRegistry.addShapedRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', Items.STICK, 'c', new ItemStack(Items.DYE, 1, 2));
-            }
-        }
-    }
 
-    @Mod.EventHandler
-    public void missingMappingEvent(FMLMissingMappingsEvent event)
-    {
-        for (FMLMissingMappingsEvent.MissingMapping missingMapping : event.get())
-        {
-            if (missingMapping.name.equals(PREFIX + "wbBucket"))
-            {
-                if (missingMapping.type == GameRegistry.Type.ITEM)
-                {
-                    missingMapping.remap(FluidModule.bucket);
-                }
-            }
-            else if (missingMapping.name.equals(PREFIX + "wbBlockMilk"))
-            {
-                if (Fluids.MILK.fluid != null)
-                {
-                    if (missingMapping.type == GameRegistry.Type.BLOCK)
-                    {
-                        missingMapping.remap(Fluids.MILK.fluid.getBlock());
-                    }
-                    else
-                    {
-                        missingMapping.remap(Item.getItemFromBlock(Fluids.MILK.fluid.getBlock()));
-                    }
-                }
-            }
-        }
+
     }
 }
