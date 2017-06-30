@@ -34,7 +34,7 @@ dependencies
 {
     testCompile 'junit:junit:4.11'
 	compile "com.builtbroken.codinglib:CodingLib:0.0.3b26:deobf"
-    compile "com.builtbroken.minecraftjunit:MinecraftJUnit:1.12-0.+:deobf"
+    //compile "com.builtbroken.minecraftjunit:MinecraftJUnit:1.12-0.+:deobf"
     compile ("com.builtbroken.vefluidhandling:VE-FluidHandling:1.12-$VEfluid_version:deobf")  { changing = true }
 
 }
