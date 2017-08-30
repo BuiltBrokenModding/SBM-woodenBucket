@@ -29,24 +29,14 @@ apply plugin: 'jacoco'
 
 dependencies 
 {
-    testCompile 'junit:junit:4.11'
-	compile "com.builtbroken.codinglib:CodingLib:0.0.3b26:deobf"
     //compile "com.builtbroken.minecraftjunit:MinecraftJUnit:1.12-0.+:deobf"
-    compile ("com.builtbroken.vefluidhandling:VE-FluidHandling:1.12-$VEfluid_version+:deobf")  { changing = true }
-    //1.12-0.8.0b1
-
+    compile ("com.builtbroken.vefluidhandling:VE-FluidHandling:1.10.2-$VEfluid_version+:deobf")  { changing = true }
 }
 
 println archivesBaseName
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8' 
-
-dependencies 
-{
-    testCompile 'junit:junit:4.11'
-}
-
 
 jacocoTestReport {
     reports {
