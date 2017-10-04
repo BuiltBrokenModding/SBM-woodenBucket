@@ -13,6 +13,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -44,6 +45,11 @@ public class WoodenBucket
     public static int AMOUNT_TO_LEAK = 1;
     public static float CHANCE_TO_LEAK = 0.03f;
     public static float LEAK_FIRE_CHANCE = 0.4f;
+
+    public WoodenBucket()
+    {
+        MinecraftForge.EVENT_BUS.register(this);
+    }
 
     @SubscribeEvent
     public void registerBucketMaterials(BucketMaterialRegistryEvent.Pre event)
