@@ -1,19 +1,21 @@
 package com.builtbroken.woodenbucket;
 
 import com.builtbroken.mc.fluids.FluidModule;
+import com.builtbroken.mc.fluids.api.reg.BucketMaterialRegistryEvent;
 import com.builtbroken.mc.fluids.bucket.BucketMaterialHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,15 +45,27 @@ public class WoodenBucket
     public static float CHANCE_TO_LEAK = 0.03f;
     public static float LEAK_FIRE_CHANCE = 0.4f;
 
+    @SubscribeEvent
+    public void registerBucketMaterials(BucketMaterialRegistryEvent.Pre event)
+    {
+        for (BucketTypes type : BucketTypes.values())
+        {
+            type.material = new WoodenBucketMaterial(type);
+            BucketMaterialHandler.addMaterial(type.name().toLowerCase(), type.material, type.ordinal());
+        }
+    }
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        //FMLCommonHandler.instance().bus().register(this);
-
         LOGGER = LogManager.getLogger("WoodenBucket");
         config = new Configuration(new File(event.getModConfigurationDirectory(), "bbm/Wooden_Bucket.cfg"));
         config.load();
+    }
 
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event)
+    {
         PREVENT_HOT_FLUID_USAGE = config.getBoolean("PreventHotFluidUsage", "WoodenBucketUsage", PREVENT_HOT_FLUID_USAGE, "Enables settings that attempt to prevent players from wanting to use the bucket for moving hot fluids");
         DAMAGE_BUCKET_WITH_HOT_FLUID = config.getBoolean("DamageBucketWithHotFluid", "WoodenBucketUsage", DAMAGE_BUCKET_WITH_HOT_FLUID, "Will randomly destroy the bucket if it contains hot fluid, lava in other words");
         BURN_ENTITY_WITH_HOT_FLUID = config.getBoolean("BurnPlayerWithHotFluid", "WoodenBucketUsage", BURN_ENTITY_WITH_HOT_FLUID, "Will light the player on fire if the bucket contains a hot fluid, lava in other words");
@@ -66,8 +80,6 @@ public class WoodenBucket
 
         for (BucketTypes type : BucketTypes.values())
         {
-            type.material = new WoodenBucketMaterial(WoodenBucket.PREFIX + "WoodenBucket." + type.name().toLowerCase(), WoodenBucket.PREFIX + "bucket." + type.name().toLowerCase());
-
             type.material.preventHotFluidUsage = PREVENT_HOT_FLUID_USAGE;
             type.material.damageBucketWithHotFluid = DAMAGE_BUCKET_WITH_HOT_FLUID;
             type.material.burnEntityWithHotFluid = BURN_ENTITY_WITH_HOT_FLUID;
@@ -77,34 +89,29 @@ public class WoodenBucket
             type.material.chanceToLeak = CHANCE_TO_LEAK;
             type.material.allowLeakToCauseFires = ALLOW_LEAK_TO_CAUSE_FIRES;
             type.material.leakFireChance = LEAK_FIRE_CHANCE;
-
-            BucketMaterialHandler.addMaterial(type.name().toLowerCase(), type.material, type.ordinal());
         }
-    }
-
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+        registerRecipes();
+    }
 
-        //TODO add crafting recipes for milk bucket
-        // TODO add proper ore shaped recipes so modded sticks and other items can be used in the recipes
-        GameRegistry.addShapedRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 0), 's', Items.stick, 'c', new ItemStack(Items.dye, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.SPRUCE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 1), 's', Items.stick, 'c', new ItemStack(Items.dye, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.BIRCH.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 2), 's', Items.stick, 'c', new ItemStack(Items.dye, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.JUNGLE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 3), 's', Items.stick, 'c', new ItemStack(Items.dye, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.ACACIA.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 4), 's', Items.stick, 'c', new ItemStack(Items.dye, 1, 2));
-        GameRegistry.addShapedRecipe(BucketTypes.BIG_OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 5), 's', Items.stick, 'c', new ItemStack(Items.dye, 1, 2));
+
+    public void registerRecipes()
+    {
+        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 0), 's', "stickWood", 'c', "dye"));
+        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.SPRUCE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 1), 's', "stickWood", 'c', "dye"));
+        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.BIRCH.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 2), 's', "stickWood", 'c', "dye"));
+        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.JUNGLE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 3), 's', "stickWood", 'c', "dye"));
+        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.ACACIA.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 4), 's', "stickWood", 'c', "dye"));
+        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.BIG_OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 5), 's', "stickWood", 'c', "dye"));
         for (ItemStack itemstack : OreDictionary.getOres("planks"))
         {
             if (itemstack != null && itemstack.getItem() != Item.getItemFromBlock(Blocks.planks))
             {
-                GameRegistry.addShapedRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', Items.stick, 'c', new ItemStack(Items.dye, 1, 2));
+                GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', "stickWood", 'c', "dye"));
             }
         }
     }

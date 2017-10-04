@@ -9,9 +9,9 @@ import net.minecraft.item.ItemStack;
  */
 public class WoodenBucketMaterial extends BucketMaterial
 {
-    public WoodenBucketMaterial(String localization, String textureName)
+    public WoodenBucketMaterial(BucketTypes type)
     {
-        super(localization, textureName);
+        super(WoodenBucket.PREFIX + "WoodenBucket." + type.name().toLowerCase(), WoodenBucket.PREFIX + "bucket." + type.name().toLowerCase());
     }
 
     @Override
