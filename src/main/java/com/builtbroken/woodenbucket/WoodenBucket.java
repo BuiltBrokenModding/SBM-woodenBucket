@@ -11,6 +11,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -107,17 +108,20 @@ public class WoodenBucket
 
     public void registerRecipes()
     {
-        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 0), 's', "stickWood", 'c', "dye"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.SPRUCE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 1), 's', "stickWood", 'c', "dye"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.BIRCH.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 2), 's', "stickWood", 'c', "dye"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.JUNGLE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 3), 's', "stickWood", 'c', "dye"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.ACACIA.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 4), 's', "stickWood", 'c', "dye"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.BIG_OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 5), 's', "stickWood", 'c', "dye"));
-        for (ItemStack itemstack : OreDictionary.getOres("planks"))
+        for(Object dye : new Object[]{"dye", Items.clay_ball, "slimeball"})
         {
-            if (itemstack != null && itemstack.getItem() != Item.getItemFromBlock(Blocks.planks))
+            GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 0), 's', "stickWood", 'c', dye));
+            GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.SPRUCE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 1), 's', "stickWood", 'c', dye));
+            GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.BIRCH.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 2), 's', "stickWood", 'c', dye));
+            GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.JUNGLE.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 3), 's', "stickWood", 'c', dye));
+            GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.ACACIA.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 4), 's', "stickWood", 'c', dye));
+            GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.BIG_OAK.getBucket(), " s ", "wcw", " w ", 'w', new ItemStack(Blocks.planks, 1, 5), 's', "stickWood", 'c', dye));
+            for (ItemStack itemstack : OreDictionary.getOres("planks"))
             {
-                GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', "stickWood", 'c', "dye"));
+                if (itemstack != null && itemstack.getItem() != Item.getItemFromBlock(Blocks.planks))
+                {
+                    GameRegistry.addRecipe(new ShapedOreRecipe(BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', "stickWood", 'c', dye));
+                }
             }
         }
     }
