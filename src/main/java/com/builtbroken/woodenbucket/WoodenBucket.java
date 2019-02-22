@@ -85,7 +85,7 @@ public class WoodenBucket
         {
             if (itemstack != null && itemstack.getItem() != Item.getItemFromBlock(Blocks.PLANKS))
             {
-                event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood." + itemstack.getUnlocalizedName()));
+                event.getRegistry().register(new ShapedOreRecipe(location, BucketTypes.OAK.getBucket(), " s ", "wcw", " w ", 'w', itemstack, 's', "stickWood", 'c', "dye").setRegistryName("bucket.wood." + itemstack.getTranslationKey()));
             }
         }
     }
