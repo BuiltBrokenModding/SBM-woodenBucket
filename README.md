@@ -1,6 +1,6 @@
 # SBM-woodenBucket
 ==========================
-Orginal bucket mod for VE-FluidHandling adding wooden bucket materials for VE-FluidHandling's bucket item.
+Original bucket mod for VE-FluidHandling adding wooden bucket materials for VE-FluidHandling's bucket item.
 
 ## Downloads
 https://minecraft.curseforge.com/projects/sbm-wooden-buckets
